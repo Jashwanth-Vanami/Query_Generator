@@ -1,0 +1,9 @@
+pyodbc
+openai
+datetime
+functools
+unittest
+logging
+abc
+hashlib
+typing

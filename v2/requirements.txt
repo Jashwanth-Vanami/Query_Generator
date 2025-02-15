@@ -1,0 +1,5 @@
+openai>=1.0.0
+pyodbc>=4.0.39
+python-dotenv>=1.0.0
+logging>=0.5.1.2
+typing>=3.7.4.3

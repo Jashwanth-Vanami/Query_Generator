@@ -1,0 +1,154 @@
+Documentation
+
+1. **Concise schema context**: The user mentioned not sending the full schema every time. So perhaps a SchemaManager class that tracks which tables/columns are relevant based on user input. Use NLP to extract entities from the query and include only related schema parts. But how to implement that simply? Maybe a dictionary of table schemas and a method to filter based on keywords in the user input.
+
+2. **Query caching**: Cache generated queries to avoid hitting the AI API for the same input. A CacheManager class using something like LRU cache, maybe with a TTL. The key would be a hash of the user input, db_type, and schema context. Store the generated query and reuse if the same request comes in.
+
+3. **Rate limiting**: For AI API calls, need to track the number of requests per time window. A RateLimiter class that uses a decorator to check if the limit is exceeded. Could use a token bucket algorithm or simple counter with timestamps.
+
+4. **Validation checks**: Before executing a generated query, check for dangerous patterns like DROP, DELETE without WHERE, etc. A QueryValidator class with a list of prohibited patterns or syntax checks. Also, verify that the query is syntactically correct for the target database. Maybe use regex initially, but for robustness, a linter or EXPLAIN plan if possible.
+
+5. **Query optimization**: Add a layer to optimize the generated query. This could involve removing redundant clauses, ensuring index usage, or simplifying joins. However, implementing a full optimizer is complex. Maybe integrate with existing tools like sqlparse for formatting and basic optimizations, or use database-specific EXPLAIN to check for efficiency.
+
+6. **Support DeepSea and Qwen APIs**: Each AI client needs to handle their specific API calls and responses. The original code only had OpenAI. So creating separate clients that implement a common interface (generate_query method) would allow easy swapping. Need to adjust the prompt handling and response parsing for each provider.
+
+Also, the user wants all classes separated for easier management. So the main class would compose these helper classes: AIClient, SchemaManager, CacheManager, RateLimiter, QueryValidator, QueryOptimizer.
+
+
+the flow would be:
+
+1. User provides input and db_type.
+
+2. SchemaManager gets concise schema context based on input.
+
+3. Check CacheManager for existing query.
+
+4. If cached, return it; else, proceed to AI generation with rate limiting.
+
+5. Generate query via the appropriate AIClient.
+
+6. Validate and optimize the query.
+
+7. Execute and return results, storing in cache if successful.
+
+
+Modular Architecture:
+
+Separate classes for different AI providers
+
+Dedicated QueryOptimizer and SchemaManager
+
+Isolated caching and rate limiting components
+
+Cost Optimization:
+
+Smart schema context management (SchemaManager)
+
+LRU caching with configurable size (QueryCache)
+
+Rate limiting decorator (RateLimiter)
+
+Token-efficient prompt construction
+
+Performance Enhancements:
+
+Query validation and optimization layer
+
+Connection pooling reuse
+
+Asynchronous API calls (can be added)
+
+Database-specific query optimization
+
+Security:
+
+Prohibited pattern validation
+
+Input sanitization
+
+Secure credential handling
+
+Extensibility:
+
+Easy to add new AI providers
+
+Configurable rate limits
+
+Pluggable caching implementations
+
+Expandable schema context rules
+
+
+
+
+
+Version 2.0
+
+Cost Tracking System:
+
+Singleton CostTracker with provider-specific pricing
+
+Integrated tracking in enhanced AI clients
+
+Detailed cost calculation methods
+
+Advanced Query Optimization:
+
+Database-specific optimization strategies
+
+Pluggable optimizer architecture
+
+Concrete implementations for MySQL/SQL Server
+
+Schema Version Control:
+
+Full version history management
+
+Schema migration capabilities
+
+Version-aware schema context generation
+
+Asynchronous Operations:
+
+Async database operations with timeouts
+
+Compatible with async/await patterns
+
+Non-blocking query execution
+
+Query Analysis Suite:
+
+Complexity scoring system
+
+Risk level classification
+
+Query explanation generation
+
+Enhanced Security:
+
+Query validation pipeline
+
+Complexity-based risk assessment
+
+Execution time limits
+
+
+
+
+
+This implementation provides:
+
+Full cost visibility across AI providers
+
+Database-specific performance optimizations
+
+Schema change management
+
+Query risk assessment
+
+Async execution capabilities
+
+Self-documenting queries
+
+Comprehensive monitoring
+
